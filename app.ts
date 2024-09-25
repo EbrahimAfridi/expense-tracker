@@ -1,5 +1,6 @@
 import {Hono} from 'hono';
 import {logger} from 'hono/logger';
+import {expensesRoute} from "./routes/expenses.ts";
 
 // App initialised
 const app = new Hono();
@@ -8,9 +9,8 @@ const app = new Hono();
 app.use(logger());
 
 // Routes
-app.get('/', (c) => c.text('Hello Hono!'))
-app.get('/test', (c) => {
-    return c.json({"message": 'Hono!'});
-});
+app.route("/api/expenses", expensesRoute);
+app.get('/', (c) => c.text('Hello Hono!'));
+
 
 export default app;

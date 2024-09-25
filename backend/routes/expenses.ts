@@ -12,14 +12,6 @@ const fakeExpenses: Expense[] = [
 
 export const expensesRoute = new Hono()
     .get("/", async (c) => c.json({expenses: fakeExpenses}))
-    .post("/", zValidator("json", createExpenseSchema), async (c) => {
-        // Zod Validation
-        const expense = c.req.valid("json");
-        fakeExpenses.push({id: fakeExpenses.length + 1, ...expense});
-
-        console.log(fakeExpenses);
-        return c.json({"expense": expense});
-    })
     .get("/:id{[0-9]+}", (c) => { // regex to check if id is number.
         const id = Number.parseInt(c.req.param("id"));
         const expense = fakeExpenses.find((expense) => expense.id === id);
@@ -28,6 +20,18 @@ export const expensesRoute = new Hono()
             return c.notFound();
         }
         return c.json(expense);
+    })
+    .get("/total-spent", async (c) => {
+        const total = fakeExpenses.reduce((acc, expense) => acc + expense.amount, 0);
+        return c.json(total);
+    })
+    .post("/", zValidator("json", createExpenseSchema), async (c) => {
+        // Zod Validation
+        const expense = c.req.valid("json");
+        fakeExpenses.push({id: fakeExpenses.length + 1, ...expense});
+
+        console.log(fakeExpenses);
+        return c.json({"expense": expense});
     })
     .delete("/:id{[0-9]+}", async (c) => {
         const id = Number.parseInt(c.req.param("id"));
